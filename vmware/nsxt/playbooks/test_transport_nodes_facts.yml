@@ -16,7 +16,7 @@
       register: tnodes
       check_mode: yes
 
-    - name: Print gathered Transport Node information
+    - name: Print basic gathered Transport Node information
       debug:
         msg:
           - "Name: {{ item.display_name }}"

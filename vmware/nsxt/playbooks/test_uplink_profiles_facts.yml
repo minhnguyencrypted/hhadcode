@@ -1,0 +1,36 @@
+# Copyright 2018 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause OR GPL-3.0-only
+---
+- hosts: 127.0.0.1
+  connection: local
+  vars_files:
+    - vars.yml
+    - secrets.yml
+  tasks:
+    - name: List uplink profiles
+      vmware.ansible_for_nsxt.nsxt_uplink_profiles_facts:
+        hostname: "{{nsxmgr}}"
+        username: "{{username}}"
+        password: "{{password}}"
+        validate_certs: false
+      register: ulprofiles
+      check_mode: yes
+
+    - name: Print gatherd Uplink profiles information
+      debug:
+        msg:
+          - "Name: {{ item.display_name }}"
+          - "ID: {{ item.id }}"
+          - "MTU: {{ item.mtu | default('Unset, using global MTU') }}"
+          - "Teaming policy: {{ item.teaming.policy }}"
+          - "Transport VLAN: {{ item.transport_vlan }}"
+          - "Active uplinks: {% for ul in item.teaming.active_list %}
+            {{ ul.uplink_name }}({{ ul.uplink_type }})
+            {% endfor %}"
+          - "Standby uplinks: {% for ul in (item.teaming.standby_list | default([])) %}
+            {{ ul.uplink_name }}({{ ul.uplink_type }})
+            {% endfor %}"
+      loop: "{{ ulprofiles.results }}"
+      loop_control:
+        label: "{{ item.display_name }}"
+      when: ulprofiles.failed == false

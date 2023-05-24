@@ -1,3 +1,4 @@
 **/secrets.*
 **/vars.*
 **/*.lock.tf
+**/*.test.yml
