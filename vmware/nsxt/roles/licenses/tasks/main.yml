@@ -1,0 +1,21 @@
+---
+
+- name: Get all licenses information
+  vmware.ansible_for_nsxt.nsxt_licenses_facts:
+    hostname: "{{nsxmgr}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    validate_certs: false
+  register: licenses
+  check_mode: yes
+
+- name: Print basic gathered license information
+  debug:
+    msg: 
+      - "Name: {{ item.description }}"
+      - "Expired?: {{ item.is_expired }}"
+      - "License key: {{ item.license_key }}"
+  loop: "{{ licenses.results }}"
+  loop_control:
+    label: "{{ item.description }}"
+  when: licenses.failed == false

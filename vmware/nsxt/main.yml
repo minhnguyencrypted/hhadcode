@@ -1,0 +1,10 @@
+---
+
+- hosts: 127.0.0.1
+  gather_facts: false
+  connection: local
+  roles:
+    - role: tzones
+    - role: tnodes
+    - role: ulprofiles
+    - role: licenses

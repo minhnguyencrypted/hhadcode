@@ -1,0 +1,24 @@
+---
+
+- name: Gather Transport Nodes information
+  vmware.ansible_for_nsxt.nsxt_transport_nodes_facts:
+    hostname: "{{nsxmgr}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    validate_certs: false
+  register: tnodes
+  check_mode: yes
+
+- name: Print basic gathered Transport Node information
+  debug:
+    msg:
+      - "Name: {{ item.display_name }}"
+      - "FQDN: {{ item.node_deployment_info.fqdn }}"
+      - "IP addresses: {{ item.node_deployment_info.discovered_ip_addresses }}"
+      - "OS: {{ item.node_deployment_info.os_type }}"
+      - "Version: {{ item.node_deployment_info.os_version}}"
+  loop: "{{ tnodes.results }}"
+  loop_control:
+    label: "{{ item.display_name }}"
+  when: tnodes.failed == false
+
