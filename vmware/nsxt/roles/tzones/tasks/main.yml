@@ -1,5 +1,22 @@
 ---
 
+- name: Configure Transport Zones
+  vmware.ansible_for_nsxt.nsxt_transport_zones:
+    hostname: "{{nsxmgr}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    validate_certs: false
+    display_name: "{{ item.display_name }}"
+    description: "{{ item.description }}"
+    tz_type: "{{ item.type }}"
+    state: "{{ item.state }}"
+  loop: "{{ transport_zones }}"
+  loop_control:
+    label: "{{ item.display_name }}"
+  tags: 
+    - tzconf
+    - conf
+
 - name: Gather Transport Zones information
   vmware.ansible_for_nsxt.nsxt_transport_zones_facts:
     hostname: "{{nsxmgr}}"
@@ -8,6 +25,9 @@
     validate_certs: false
   register: tzones
   check_mode: yes
+  tags: 
+    - tzfacts
+    - facts
 
 - name: Print gathered Transport Zones information
   debug:
@@ -19,4 +39,7 @@
   loop_control:
     label: "{{ item.display_name }}"
   when: tzones.failed == false
+  tags: 
+    - tzfacts
+    - facts
 

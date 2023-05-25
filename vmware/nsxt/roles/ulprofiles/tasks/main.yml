@@ -1,5 +1,25 @@
 ---
 
+- name: Configure uplink profiles
+  vmware.ansible_for_nsxt.nsxt_uplink_profiles:
+    hostname: "{{nsxmgr}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    validate_certs: false
+    display_name: "{{ item.display_name }}"
+    description: "{{ item.description | default(omit) }}"
+    mtu: "{{ item.mtu | default(omit) }}"
+    resource_type: UplinkHostSwitchProfile
+    teaming: "{{ item.teaming }}"
+    transport_vlan: "{{ item.transport_vlan | default(omit) }}"
+    state: "{{ item.state }}"
+  loop: "{{ ulprofiles }}"
+  loop_control:
+    label: "{{ item.display_name }}"
+  tags:
+    - ulpconf
+    - conf
+
 - name: Gather uplink profiles information
   vmware.ansible_for_nsxt.nsxt_uplink_profiles_facts:
     hostname: "{{nsxmgr}}"
@@ -8,6 +28,9 @@
     validate_certs: false
   register: ulprofiles
   check_mode: yes
+  tags:
+    - ulpfacts
+    - facts
 
 - name: Print gatherd Uplink profiles information
   debug:
@@ -27,3 +50,7 @@
   loop_control:
     label: "{{ item.display_name }}"
   when: ulprofiles.failed == false
+  tags:
+    - ulpfacts
+    - facts
+

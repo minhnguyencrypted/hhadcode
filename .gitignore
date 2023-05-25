@@ -2,3 +2,4 @@
 **/vars.*
 **/*.lock.tf
 **/*.test.yml
+**/roles/*/vars/*
