@@ -11,8 +11,11 @@
     mtu: "{{ item.mtu | default(omit) }}"
     resource_type: UplinkHostSwitchProfile
     teaming: "{{ item.teaming }}"
+    named_teamings: "{{ item.named_teamings | default(omit) }}"
+    lags: "{{ item.lags | default(omit) }}"
     transport_vlan: "{{ item.transport_vlan | default(omit) }}"
-    state: "{{ item.state }}"
+    tags: "{{ item.tags | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
   loop: "{{ ulprofiles }}"
   loop_control:
     label: "{{ item.display_name }}"

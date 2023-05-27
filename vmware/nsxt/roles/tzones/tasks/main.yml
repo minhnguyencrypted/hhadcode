@@ -7,9 +7,11 @@
     password: "{{password}}"
     validate_certs: false
     display_name: "{{ item.display_name }}"
-    description: "{{ item.description }}"
+    description: "{{ item.description | default(omit) }}"
     tz_type: "{{ item.type }}"
-    state: "{{ item.state }}"
+    is_default: "{{ item.is_default | default(False) }}"
+    tags: "{{ item.tags | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
   loop: "{{ transport_zones }}"
   loop_control:
     label: "{{ item.display_name }}"
