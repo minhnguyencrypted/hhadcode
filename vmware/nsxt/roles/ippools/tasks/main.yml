@@ -1,0 +1,57 @@
+---
+
+- name: Create IP pools
+  vmware.ansible_for_nsxt.nsxt_ip_pools:
+    hostname: "{{ nsxmgr }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    validate_certs: False
+    display_name: "{{ item.display_name }}"
+    description: "{{ item.description | default(omit) }}"
+    subnets:  "{{ item.subnets }}"
+    tags: "{{ item.tags | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ pools }}"
+  loop_control:
+    label: "{{ item.display_name }}"
+  tags:
+    - ippconf
+    - conf
+
+- name: Gather IP pools information
+  vmware.ansible_for_nsxt.nsxt_ip_pools_facts:
+    hostname: "{{ nsxmgr }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    validate_certs: False
+  register: pools
+  check_mode: yes
+  tags:
+    - ippfacts
+    - facts
+
+- name: Display gatherd IP pools information
+  vars:
+    msg: |
+      Name: {{ item.display_name }}
+      ID: {{ item.id }}
+      Description: {{ item.description }}
+      {% for sn in item.subnets %}
+      CIDR: {{ sn.cidr }}
+      Allocation ranges: 
+      {% for range in sn.allocation_ranges %}
+        {{ range.start }} - {{ range.end }}
+      {% endfor %}
+      Gateway: {{ sn.gateway_ip }}
+      {% endfor %}
+  debug:
+    msg: "{{ msg | split('\n') }}"
+  loop: "{{ pools.results | selectattr('_system_owned','false') | list }}"
+  loop_control:
+    label: "{{ item.display_name }}"
+  when: pools.failed == False
+  check_mode: yes
+  tags:
+    - ippfacts
+    - facts
+

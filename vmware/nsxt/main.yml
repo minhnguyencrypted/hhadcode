@@ -5,6 +5,7 @@
   connection: local
   roles:
     - role: tzones
-    - role: tnodes
     - role: ulprofiles
+    - role: ippools
+    - role: tnodes
     - role: licenses

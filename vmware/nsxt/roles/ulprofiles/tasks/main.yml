@@ -36,19 +36,22 @@
     - facts
 
 - name: Print gatherd Uplink profiles information
+  vars:
+    msg: |
+      Name: {{ item.display_name }}
+      ID: {{ item.id }}
+      MTU: {{ item.mtu | default('Unset, using global MTU') }}
+      Teaming policy: {{ item.teaming.policy }}
+      Transport VLAN: {{ item.transport_vlan }}
+      Active uplinks: 
+      {% for ul in item.teaming.active_list %}
+        {{ ul.uplink_name }}({{ ul.uplink_type }})
+      {% endfor %}
+      Standby uplinks: {% for ul in (item.teaming.standby_list | default([])) %}
+        {{ ul.uplink_name }}({{ ul.uplink_type }})
+      {% endfor %}
   debug:
-    msg:
-      - "Name: {{ item.display_name }}"
-      - "ID: {{ item.id }}"
-      - "MTU: {{ item.mtu | default('Unset, using global MTU') }}"
-      - "Teaming policy: {{ item.teaming.policy }}"
-      - "Transport VLAN: {{ item.transport_vlan }}"
-      - "Active uplinks: {% for ul in item.teaming.active_list %}
-        {{ ul.uplink_name }}({{ ul.uplink_type }})
-        {% endfor %}"
-      - "Standby uplinks: {% for ul in (item.teaming.standby_list | default([])) %}
-        {{ ul.uplink_name }}({{ ul.uplink_type }})
-        {% endfor %}"
+    msg: "{{ msg.split('\n') }}"
   loop: "{{ ulprofiles.results }}"
   loop_control:
     label: "{{ item.display_name }}"
