@@ -1,14 +1,15 @@
 ---
 
 - name: Create IP pools
-  vmware.ansible_for_nsxt.nsxt_ip_pools:
+  vmware.ansible_for_nsxt.nsxt_policy_ip_pool:
     hostname: "{{ nsxmgr }}"
     username: "{{ username }}"
     password: "{{ password }}"
     validate_certs: False
     display_name: "{{ item.display_name }}"
     description: "{{ item.description | default(omit) }}"
-    subnets:  "{{ item.subnets }}"
+    pool_block_subnets: "{{ item.pool_block_subnets | default(omit) }}"
+    pool_static_subnets: "{{ item.pool_static_subnets | default(omit) }}"
     tags: "{{ item.tags | default(omit) }}"
     state: "{{ item.state | default('present') }}"
   loop: "{{ pools }}"
